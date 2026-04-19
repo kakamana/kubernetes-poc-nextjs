@@ -22,9 +22,16 @@ ghcr.io/kakamana/kubernetes-poc-nextjs:v0.1.0
 | `k8s/` | Kustomize-based manifests — apply with `kubectl apply -k k8s/` |
 | `k8s/README.md` | Demo runbook (Act-by-Act commands for the walk-through) |
 | `postgres-ha/values.yaml` | Bitnami `postgresql-ha` Helm values for the active/passive demo |
-| `MOROHUB_HANDOFF.docx` | The full handoff document — demo journey, checklist, questions |
+| `DEPLOYMENT_GUIDE.docx` | **For the deploy engineer** — full release + deployment runbook |
+| `DEPLOYMENT_GUIDE.md` | Same content in Markdown |
+| `MOROHUB_HANDOFF.docx` | **For the walk-through session** — demo journey, checklist, questions |
 | `MOROHUB_HANDOFF.md` | Same content in Markdown |
 | `HANDOFF_README.md` | This file |
+
+**Which document do I read first?**
+
+- If you are **deploying**: open `DEPLOYMENT_GUIDE.docx` — step-by-step apply, verify, and operate.
+- If you are **running the walk-through session with Kamran**: open `MOROHUB_HANDOFF.docx` — Act 0 → Act 8 demo script.
 
 ## One-command deploy
 

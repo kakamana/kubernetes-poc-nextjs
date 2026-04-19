@@ -29,8 +29,23 @@ from docx.oxml import OxmlElement
 from docx.shared import Pt, RGBColor, Inches
 
 ROOT = Path(__file__).resolve().parent.parent
-SRC = ROOT / "docs" / "MOROHUB_HANDOFF.md"
-DST = ROOT / "docs" / "MOROHUB_HANDOFF.docx"
+
+# (source.md, output.docx, title, subtitle) — add new entries here to emit
+# more DOCX files in one run.
+DOCS = [
+    (
+        ROOT / "docs" / "MOROHUB_HANDOFF.md",
+        ROOT / "docs" / "MOROHUB_HANDOFF.docx",
+        "MoroHub Handoff",
+        "Meeting Preparation and Walk-through Guide",
+    ),
+    (
+        ROOT / "docs" / "DEPLOYMENT_GUIDE.md",
+        ROOT / "docs" / "DEPLOYMENT_GUIDE.docx",
+        "Deployment & Release Guide",
+        "MoroHub Kubernetes Service — Release v0.1.0",
+    ),
+]
 
 
 INLINE_CODE = re.compile(r"`([^`]+)`")
@@ -138,7 +153,7 @@ def add_table(doc: Document, rows: list[list[str]]) -> None:
             add_runs(para, cell_text, base_bold=(ri == 0))
 
 
-def convert(md_path: Path, docx_path: Path) -> None:
+def convert(md_path: Path, docx_path: Path, title_text: str, subtitle_text: str) -> None:
     text = md_path.read_text(encoding="utf-8")
     # Strip the top H1 — we add a formatted title ourselves.
     lines = text.splitlines()
@@ -154,13 +169,13 @@ def convert(md_path: Path, docx_path: Path) -> None:
     # Title block
     title = doc.add_paragraph()
     title.alignment = WD_ALIGN_PARAGRAPH.LEFT
-    r = title.add_run("MoroHub Handoff")
+    r = title.add_run(title_text)
     r.bold = True
     r.font.size = Pt(26)
     r.font.color.rgb = RGBColor(0x0B, 0x1F, 0x4A)
 
     subtitle = doc.add_paragraph()
-    r = subtitle.add_run("Meeting Preparation and Walk-through Guide")
+    r = subtitle.add_run(subtitle_text)
     r.italic = True
     r.font.size = Pt(13)
     r.font.color.rgb = RGBColor(0x64, 0x74, 0x8B)
@@ -266,4 +281,5 @@ def convert(md_path: Path, docx_path: Path) -> None:
 
 
 if __name__ == "__main__":
-    convert(SRC, DST)
+    for src, dst, title, subtitle in DOCS:
+        convert(src, dst, title, subtitle)
