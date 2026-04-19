@@ -1,0 +1,25 @@
+# PodDisruptionBudget — ensures at least one web pod is always serving traffic
+# during voluntary disruptions (node drains, rolling upgrades of the node pool).
+# This is the control that Morohub's team can invoke when talking about
+# "business continuity" / "what happens if a node goes down".
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: web
+  namespace: morohub-poc
+spec:
+  minAvailable: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: web
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: postgres
+  namespace: morohub-poc
+spec:
+  maxUnavailable: 0              # single-instance StatefulSet stays up
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres

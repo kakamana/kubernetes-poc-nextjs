@@ -1,0 +1,50 @@
+# -----------------------------------------------------------------------------
+# Ingress (NGINX) with session stickiness.
+#
+# Session stickiness is requested via the session-cookie affinity annotations.
+# When enabled, the ingress controller sets a cookie ("morohub-affinity") so
+# subsequent requests from the same browser keep hitting the same pod — useful
+# for demos where you want to show the pod hostname staying constant.
+#
+# To DISABLE stickiness (to demo round-robin load balancing instead):
+#   kubectl -n morohub-poc annotate ingress web \
+#     nginx.ingress.kubernetes.io/affinity- --overwrite
+# -----------------------------------------------------------------------------
+
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: web
+  namespace: morohub-poc
+  annotations:
+    # Session stickiness — cookie-based
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    nginx.ingress.kubernetes.io/session-cookie-name: "morohub-affinity"
+    nginx.ingress.kubernetes.io/session-cookie-max-age: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-expires: "3600"
+    nginx.ingress.kubernetes.io/session-cookie-path: "/"
+    nginx.ingress.kubernetes.io/session-cookie-samesite: "Lax"
+
+    # Typical hardening
+    nginx.ingress.kubernetes.io/proxy-body-size: "2m"
+    nginx.ingress.kubernetes.io/proxy-read-timeout: "60"
+    nginx.ingress.kubernetes.io/proxy-send-timeout: "60"
+spec:
+  ingressClassName: nginx
+  rules:
+    - host: morohub-poc.example.com       # REPLACE with the hostname MoroHub provides
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: web
+                port:
+                  number: 80
+  # Uncomment when TLS is in place
+  # tls:
+  #   - hosts:
+  #       - morohub-poc.example.com
+  #     secretName: web-tls

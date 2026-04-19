@@ -1,0 +1,89 @@
+# -----------------------------------------------------------------------------
+# Single-instance PostgreSQL as a StatefulSet.
+#
+# This is the "simple" Postgres path you can walk the MoroHub team through.
+# For production-grade active/passive HA, switch to the Bitnami postgresql-ha
+# Helm chart (see postgres-ha/values.yaml in this repo).
+# -----------------------------------------------------------------------------
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-primary
+  namespace: morohub-poc
+  labels:
+    app.kubernetes.io/name: postgres
+    app.kubernetes.io/component: primary
+spec:
+  clusterIP: None                 # headless, so each pod gets a stable DNS name
+  selector:
+    app.kubernetes.io/name: postgres
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: 5432
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: morohub-poc
+  labels:
+    app.kubernetes.io/name: postgres
+spec:
+  serviceName: postgres-primary
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres
+    spec:
+      terminationGracePeriodSeconds: 30
+      securityContext:
+        fsGroup: 999
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: postgres
+              containerPort: 5432
+          envFrom:
+            - secretRef:
+                name: postgres-secrets
+          env:
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "1000m"
+              memory: "1Gi"
+          readinessProbe:
+            exec:
+              command: ["pg_isready", "-U", "morohub", "-d", "morohub"]
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+          livenessProbe:
+            exec:
+              command: ["pg_isready", "-U", "morohub", "-d", "morohub"]
+            initialDelaySeconds: 20
+            periodSeconds: 10
+            timeoutSeconds: 3
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 5Gi

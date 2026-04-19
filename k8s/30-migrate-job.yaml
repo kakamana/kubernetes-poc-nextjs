@@ -1,0 +1,43 @@
+# One-shot Job that runs `prisma migrate deploy` (or `prisma db push` for POC)
+# and seeds the database. Re-running it is safe — upserts only.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: web-db-migrate
+  namespace: morohub-poc
+spec:
+  backoffLimit: 3
+  ttlSecondsAfterFinished: 3600
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: web
+        app.kubernetes.io/component: migrate
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: migrate
+          # Use the same image as the app — it ships prisma + schema under /app/prisma
+          image: ghcr.io/REPLACE_ME/kubernetes-poc-nextjs:latest
+          imagePullPolicy: IfNotPresent
+          workingDir: /app
+          command: ["/bin/sh", "-c"]
+          args:
+            - |
+              set -eu
+              echo "Applying Prisma schema via db push (POC-friendly)..."
+              node_modules/.bin/prisma db push --skip-generate --accept-data-loss
+              echo "Seeding..."
+              node_modules/.bin/tsx prisma/seed.ts
+          envFrom:
+            - configMapRef:
+                name: web-config
+            - secretRef:
+                name: web-secrets
+          resources:
+            requests:
+              cpu: "100m"
+              memory: "256Mi"
+            limits:
+              cpu: "500m"
+              memory: "512Mi"

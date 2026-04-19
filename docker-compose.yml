@@ -1,0 +1,40 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: morohub-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: morohub
+      POSTGRES_PASSWORD: morohub
+      POSTGRES_DB: morohub
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U morohub -d morohub"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: morohub/kubernetes-poc-nextjs:local
+    container_name: morohub-web
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://morohub:morohub@postgres:5432/morohub?schema=public
+      AUTH_SECRET: local-dev-secret-change-me-32bytes-xx
+      AUTH_TRUST_HOST: "true"
+      NODE_ENV: production
+      POD_NAMESPACE: local-compose
+      NODE_NAME: docker-compose
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:

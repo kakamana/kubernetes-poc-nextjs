@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: morohub-poc
+  labels:
+    app.kubernetes.io/part-of: morohub-poc
+    istio-injection: disabled
