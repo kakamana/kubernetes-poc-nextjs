@@ -45,6 +45,12 @@ DOCS = [
         "Deployment & Release Guide",
         "MoroHub Kubernetes Service — Release v0.1.0",
     ),
+    (
+        ROOT / "docs" / "MOROHUB_EMAIL.md",
+        ROOT / "docs" / "MOROHUB_EMAIL.docx",
+        "Email to MoroHub Team",
+        "Copy/paste ready — Subject + Body",
+    ),
 ]
 
 
