@@ -5,7 +5,7 @@ metadata:
   namespace: morohub-poc
 data:
   NODE_ENV: "production"
-  PORT: "3000"
+  PORT: "5500"
   HOSTNAME: "0.0.0.0"
   AUTH_TRUST_HOST: "true"
   NEXT_TELEMETRY_DISABLED: "1"

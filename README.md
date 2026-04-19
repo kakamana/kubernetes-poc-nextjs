@@ -47,7 +47,7 @@ so you can watch session stickiness and rolling updates in real time.
 docker compose up --build -d
 docker compose exec web node_modules/.bin/prisma db push --accept-data-loss
 docker compose exec web node_modules/.bin/tsx prisma/seed.ts
-open http://localhost:3000
+open http://localhost:5500
 ```
 
 ### Option B — Native Node + Postgres

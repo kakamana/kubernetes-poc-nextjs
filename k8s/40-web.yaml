@@ -23,7 +23,7 @@ spec:
   ports:
     - name: http
       port: 80
-      targetPort: 3000
+      targetPort: 5500
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -71,7 +71,7 @@ spec:
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
-              containerPort: 3000
+              containerPort: 5500
           envFrom:
             - configMapRef:
                 name: web-config

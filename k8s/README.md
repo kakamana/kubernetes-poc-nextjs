@@ -136,7 +136,7 @@ kubectl -n morohub-poc get pods -w
 | Symptom | What to check |
 |---------|---------------|
 | App pods CrashLoopBackOff | `kubectl logs` — usually DB unreachable or missing `AUTH_SECRET` |
-| `readiness` failing | `kubectl exec ... -- curl localhost:3000/api/ready` — returns DB error |
+| `readiness` failing | `kubectl exec ... -- curl localhost:5500/api/ready` — returns DB error |
 | HPA stuck at minReplicas | `kubectl top pods` / metrics-server installed? |
 | Ingress 404 | `ingressClassName: nginx` matches the controller's class? |
 | PVC Pending | Default StorageClass set on the cluster? |

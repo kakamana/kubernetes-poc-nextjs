@@ -34,7 +34,7 @@ services:
       POD_NAMESPACE: local-compose
       NODE_NAME: docker-compose
     ports:
-      - "3000:3000"
+      - "5500:5500"
 
 volumes:
   pgdata:

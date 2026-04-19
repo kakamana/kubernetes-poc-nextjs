@@ -25,10 +25,12 @@ spec:
           args:
             - |
               set -eu
+              export PATH="/opt/tools/node_modules/.bin:$PATH"
+              export NODE_PATH="/opt/tools/node_modules"
               echo "Applying Prisma schema via db push (POC-friendly)..."
-              node_modules/.bin/prisma db push --skip-generate --accept-data-loss
+              prisma db push --skip-generate --accept-data-loss
               echo "Seeding..."
-              node_modules/.bin/tsx prisma/seed.ts
+              tsx prisma/seed.ts
           envFrom:
             - configMapRef:
                 name: web-config
